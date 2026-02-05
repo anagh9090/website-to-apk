@@ -14,16 +14,20 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # NEW STEP: This fixes the "cmdline-tools not found" error
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
           packages: 'platform-tools cmdline-tools;latest build-tools;33.0.2 platforms;android-33'
 
+      - name: Link SDK for Jipok Script
+        run: |
+          # This finds where GitHub installed the tools and creates a shortcut
+          # so Jipok's script thinks they are in the local folder
+          ln -s $ANDROID_SDK_ROOT/cmdline-tools/latest ./cmdline-tools
+          echo "[*] SDK Shortcut created at ./cmdline-tools"
+
       - name: Build AntherAI with Make Script
         run: |
-          # We manually point the script to the SDK location GitHub uses
-          export ANDROID_HOME=$ANDROID_SDK_ROOT
           chmod +x make.sh
           ./make.sh build webapk.conf
 
