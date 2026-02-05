@@ -21,14 +21,15 @@ jobs:
 
       - name: Link SDK for Jipok Script
         run: |
-          # This finds where GitHub installed the tools and creates a shortcut
-          # so Jipok's script thinks they are in the local folder
           ln -s $ANDROID_SDK_ROOT/cmdline-tools/latest ./cmdline-tools
-          echo "[*] SDK Shortcut created at ./cmdline-tools"
+          echo "[*] SDK Shortcut created"
 
-      - name: Build AntherAI with Make Script
+      - name: Generate Keystore and Build
         run: |
           chmod +x make.sh
+          # NEW: Create the digital signature key first
+          ./make.sh keygen
+          # Then build the APK using that key
           ./make.sh build webapk.conf
 
       - name: Upload AntherAI APK
