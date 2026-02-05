@@ -6,21 +6,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4  # Updated to v4
+        uses: actions/checkout@v4
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4  # Updated to v4
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
+      # NEW STEP: This fixes the "cmdline-tools not found" error
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools cmdline-tools;latest build-tools;33.0.2 platforms;android-33'
+
       - name: Build AntherAI with Make Script
         run: |
+          # We manually point the script to the SDK location GitHub uses
+          export ANDROID_HOME=$ANDROID_SDK_ROOT
           chmod +x make.sh
           ./make.sh build webapk.conf
 
       - name: Upload AntherAI APK
-        uses: actions/upload-artifact@v4  # FIXED: Updated from v3 to v4
+        uses: actions/upload-artifact@v4
         with:
           name: AntherAI-Signed-APK
           path: ./*.apk
